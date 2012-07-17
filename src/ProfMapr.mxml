@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:mx="http://www.adobe.com/2006/mxml" layout="absolute" creationComplete="send_data(); startTimer();" xmlns:ns1="*">
+	<mx:Image id = "map1" x="350" width="800" height="736" source="start.gif"/>
+	<mx:RadioButtonGroup id="ChooseFloor"/>
+	    <mx:RadioButton id="floor1" x="25" y="25" groupName="ChooseFloor" selected="false" click = "floor = 1; updateMap()" scaleX="1" scaleY="1" upIcon='@Embed(source="f1button.png")' overIcon='@Embed(source="f1button.png")' downIcon='@Embed(source="f1button.png")' selectedUpIcon='@Embed(source="f1buttonsel.png")' selectedOverIcon='@Embed(source="f1buttonsel.png")' selectedDownIcon='@Embed(source="f1buttonsel.png")'/>
+	    <mx:RadioButton id="floor2" x="25" y="85" groupName="ChooseFloor" selected="false" click = "floor = 2; updateMap()" scaleX="1" scaleY="1"  upIcon='@Embed(source="f2button.png")' overIcon='@Embed(source="f2button.png")' downIcon='@Embed(source="f2button.png")' selectedUpIcon='@Embed(source="f2buttonsel.png")' selectedOverIcon='@Embed(source="f2buttonsel.png")' selectedDownIcon='@Embed(source="f2buttonsel.png")'/>
+	    <mx:RadioButton id="floor3" x="25" y="145" groupName="ChooseFloor" selected="false" click = "floor = 3; updateMap()" scaleX="1" scaleY="1"  upIcon='@Embed(source="f3button.png")' overIcon='@Embed(source="f3button.png")' downIcon='@Embed(source="f3button.png")' selectedUpIcon='@Embed(source="f3buttonsel.png")' selectedOverIcon='@Embed(source="f3buttonsel.png")' selectedDownIcon='@Embed(source="f3buttonsel.png")'/>
+	    <mx:RadioButton id="floor4" x="25" y="205" groupName="ChooseFloor" selected="false" click = "floor = 4; updateMap()" scaleX="1" scaleY="1"  upIcon='@Embed(source="f4button.png")' overIcon='@Embed(source="f4button.png")' downIcon='@Embed(source="f4button.png")' selectedUpIcon='@Embed(source="f4buttonsel.png")' selectedOverIcon='@Embed(source="f4buttonsel.png")' selectedDownIcon='@Embed(source="f4buttonsel.png")'/>
+	
+    <!--<mx:HTTPService id="userRequest" url="http://www.instamapper.com/api?action=getPositions&amp;key=###############" useProxy="false" resultFormat="text"></mx:HTTPService>-->
+    <mx:RadioButtonGroup id="profChooser"/>
+    <mx:RadioButton x="100" y="25" groupName="profChooser" click = "getProfFloor(1)" scaleX="1" scaleY="1"  upIcon='@Embed(source="eln.png")' overIcon='@Embed(source="eln.png")' downIcon='@Embed(source="eln.png")' selectedUpIcon='@Embed(source="elnsel.png")' selectedOverIcon='@Embed(source="elnsel.png")' selectedDownIcon='@Embed(source="elnsel.png")'/>
+	<mx:RadioButton x="100" y="85" groupName="profChooser" click = "getProfFloor(2)" scaleX="1" scaleY="1" upIcon='@Embed(source="kk.png")' overIcon='@Embed(source="kk.png")' downIcon='@Embed(source="kk.png")' selectedUpIcon='@Embed(source="kksel.png")' selectedOverIcon='@Embed(source="kksel.png")' selectedDownIcon='@Embed(source="kksel.png")'/>
+    <mx:RadioButton x="100" y="145" groupName="profChooser" click = "getProfFloor(3)" scaleX="1" scaleY="1" upIcon='@Embed(source="nic.png")' overIcon='@Embed(source="nic.png")' downIcon='@Embed(source="nic.png")' selectedUpIcon='@Embed(source="nicsel.png")' selectedOverIcon='@Embed(source="nicsel.png")' selectedDownIcon='@Embed(source="nicsel.png")'/>
+    
+    <ns1:Professor id="prof1" click = "elenaRequest()" x="{map1.x+prof1.XCoord-prof1.width/2}" y="{map1.y+prof1.YCoord-prof1.height/2}" visible="{prof1.floorNumber==1}" upSkin='@Embed(source="eln.png")' downSkin='@Embed(source="eln.png")' overSkin='@Embed(source="eln.png")' disabledSkin='@Embed(source="eln.png")' />
+	<ns1:Professor id="prof2" click = "kkRequest()" x="{map1.x+prof2.XCoord-2*prof2.width/3}" y="{map1.y+prof2.YCoord-2*prof2.height/3}" visible="{prof2.floorNumber==1}" upSkin='@Embed(source="kk.png")' downSkin='@Embed(source="kk.png")' overSkin='@Embed(source="kk.png")' disabledSkin='@Embed(source="kk.png")'/>
+    <ns1:Professor id="prof3" click = "nicRequest()" x="{map1.x+prof3.XCoord-prof3.width/3}" y="{map1.y+prof3.YCoord-prof3.height/3}" visible="{prof3.floorNumber==1}"  upSkin='@Embed(source="nic.png")' downSkin='@Embed(source="nic.png")' overSkin='@Embed(source="nic.png")' disabledSkin='@Embed(source="nic.png")'/>
+
+	<mx:Script>
+		<![CDATA[
+			import mx.formatters.DateFormatter;
+			import mx.rpc.http.mxml.HTTPService;
+
+		private var timer:Timer = new Timer(30000);
+		private var floor:Number = 1;
+		[Bindable] private var NicURL:String = "http://www.google.com/calendar/embed?src=nic.mcphee%40gmail.com";
+		[Bindable] private var ElenaURL:String = "http://cda.morris.umn.edu/~elenam/";
+		[Bindable] private var KKURL:String = "http://www.morris.umn.edu/~lamberty/schedule.html";
+		[Bindable] private var testString:String = "";
+		[Embed(source='floor1.svg')][Bindable] private var Floor1:Class;
+		[Embed(source='floor2.svg')][Bindable] private var Floor2:Class;
+		[Embed(source='floor3.svg')][Bindable] private var Floor3:Class;
+		[Embed(source='floor4.svg')][Bindable] private var Floor4:Class;
+		
+		private function startTimer():void {
+			timer.start();
+			timer.addEventListener(TimerEvent.TIMER, updateStuff)
+		}
+			
+		private function nicRequest():void{
+			var request:URLRequest = new URLRequest(NicURL);
+			navigateToURL(request, '_blank');
+		}
+			private function elenaRequest():void{
+				var request:URLRequest = new URLRequest(ElenaURL);
+				navigateToURL(request, '_blank');
+			}
+			private function kkRequest():void{
+				var request:URLRequest = new URLRequest(KKURL);
+				navigateToURL(request, '_blank');
+			}
+		
+		private function writeResults():void {
+			var date:Date = new Date();
+			var formatter:DateFormatter = new DateFormatter();
+			formatter.formatString = "MMMDD L:NN A ";
+			testString += formatter.format(date);
+			var profArray:Array = prof1.getArray();
+			testString += profArray[2];
+			testString += "\nElena: (";
+			testString += profArray[4];
+			testString += ", ";
+			testString += profArray[3];
+			testString += ") ";
+			testString += profArray[5];
+			testString += " --> (";
+			testString += prof1.XCoord.toString();
+			testString += ",";
+			testString += prof1.YCoord.toString();
+			testString += ") ";
+			testString += prof1.floorNumber.toString();
+			testString += "\nEugene: (";
+			testString += prof2.XCoord;
+			testString += ", ";
+			testString += prof2.YCoord;
+			testString += ") ";
+			testString += prof2.getArray()[5];
+			testString += " \nNic: (";
+			testString += prof3.XCoord;
+			testString += ", ";
+			testString += prof3.YCoord;
+			testString += ") ";
+			testString += prof2.getArray()[5];
+			testString += "\n";
+		}
+		
+		private function updateStuff(event:Event):void {
+		//	send_data();
+		//	updateMap();
+		//	writeResults();
+		//profString = getProfArray(1)[4].toString();
+		}
+		
+		private function updateProfessors():void {
+			//prof1.setArray(getProfArray(1));
+			prof1.interpCoordinates();
+			//prof2.setArray(getProfArray(2));
+			prof2.interpCoordinates();
+			//prof3.setArray(getProfArray(3));
+			prof3.interpCoordinates();
+		}
+
+		private function getProfFloor(prof:Number):void {
+			switch(prof) {
+				case 1:
+				floor = prof1.floorNumber;
+				break;
+				case 2: 
+				floor = prof2.floorNumber;
+				break;
+				case 3: 
+				floor = prof3.floorNumber;
+				break;
+			}
+			updateMap();
+		}
+		
+		private function send_data():void {
+              //  userRequest.send();
+        }
+        
+ //     private function getProfArray(prof:Number):Array {
+ //    		return userRequest.lastResult.toString().split(/\n+/)[prof].toString().split(/,+/);
+ //    	}
+
+		private function updateMap():void {
+			//updateProfessors();
+				switch(floor) {
+					case 1:
+					map1.source = Floor1;
+					getProfs(floor)
+					break;
+					case 2:
+					map1.source = Floor2;
+					getProfs(floor)
+					break;
+					case 3:
+					map1.source = Floor3;
+					getProfs(floor)
+					break;
+					case 4:
+					map1.source = Floor4;
+					getProfs(floor)
+					break;
+				}
+		}
+			
+	    private function getProfs(floor:Number):void {
+				switch(floor){
+					case 1:
+					if(prof1.floorNumber == 1) prof1.setVisible(true);
+					else prof1.setVisible(false);
+					if(prof2.floorNumber == 1) prof2.setVisible(true);
+					else prof2.setVisible(false);
+					if(prof3.floorNumber == 1) prof3.setVisible(true);
+					else prof3.setVisible(false);
+					
+					floor1.selected = true;
+					floor2.selected = false;
+					floor3.selected = false;
+					floor4.selected = false;
+					break;
+					case 2:
+					if(prof1.floorNumber == 2) prof1.setVisible(true);
+					else prof1.setVisible(false);
+					if(prof2.floorNumber == 2) prof2.setVisible(true);
+					else prof2.setVisible(false);
+					if(prof3.floorNumber == 2) prof3.setVisible(true);
+					else prof3.setVisible(false);
+					
+					floor1.selected = false;
+					floor2.selected = true;
+					floor3.selected = false;
+					floor4.selected = false;
+					break;
+					case 3:
+					if(prof1.floorNumber == 3) prof1.setVisible(true);
+					else prof1.setVisible(false);
+					if(prof2.floorNumber == 3) prof2.setVisible(true);
+					else prof2.setVisible(false);
+					if(prof3.floorNumber == 3) prof3.setVisible(true);
+					else prof3.setVisible(false);
+					
+					floor1.selected = false;
+					floor2.selected = false;
+					floor3.selected = true;
+					floor4.selected = false;
+					break;
+					case 4:
+					if(prof1.floorNumber == 4) prof1.setVisible(true);
+					else prof1.setVisible(false);
+					if(prof2.floorNumber == 4) prof2.setVisible(true);
+					else prof2.setVisible(false);
+					if(prof3.floorNumber == 4) prof3.setVisible(true);
+					else prof3.setVisible(false);
+					
+					floor1.selected = false;
+					floor2.selected = false;
+					floor3.selected = false;
+					floor4.selected = true;
+					break;
+				}
+		}
+
+		]]>
+	</mx:Script>
+</mx:Application>
+

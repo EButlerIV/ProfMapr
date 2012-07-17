@@ -1,0 +1,32 @@
+/**
+ * @author  Augie Marcello
+ * @version Augie Marcello Blog v0.9.3
+ * @url     http://www.augiemarcello.com
+ */
+Application { 
+   backgroundColor: #ffffff;
+}
+.header{
+	font-weight: bold;
+	font-size: 17px;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+
+.subHeader{
+ 	font-weight: bold;
+	font-size: 12px;
+	padding-left: 5px;
+}
+
+
+.footer{
+ 	font-weight: bold;
+	font-size: 12px;
+	padding-left: 5px;
+	padding-top: 5px;
+}
+
+.cbStyle{
+	padding-left: 18px;
+}
